@@ -10,10 +10,11 @@ import axios from 'axios';
 class Blog extends Component {
     state = {
         post: [],
-        selectedPost: null
+        selectedPost: null,
+        errorFound: false
     };
     componentDidMount() {
-        axios.get('http://jsonplaceholder.typicode.com/posts')
+        axios.get('/posts')
         .then(response => {
             const fetchPost = response.data.slice(0, 4);
             const updatedPosts = fetchPost.map(post => {
@@ -23,6 +24,10 @@ class Blog extends Component {
                 }
             });
             this.setState({ post: updatedPosts});
+        })
+        .catch(error => {
+            //console.log(error);
+            this.setState({errorFound: true});
         });
     }
 
@@ -31,13 +36,17 @@ class Blog extends Component {
     }
 
     render () {
-        const post = this.state.post.map(post => {
-            return <Post 
-            key={post.id} 
-            title={post.title} 
-            author={post.author} 
-            clicked={() => this.selectedPostHandler(post.id)} />
-        });
+        let post = <p>Something Went Wrong!</p>;
+        if(!this.state.errorFound) {
+            post = this.state.post.map(post => {
+                return <Post 
+                key={post.id} 
+                title={post.title} 
+                author={post.author} 
+                clicked={() => this.selectedPostHandler(post.id)} />
+            });
+        }
+        
         return (
             <div>
                 <section className="Posts">
